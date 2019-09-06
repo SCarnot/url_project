@@ -128,7 +128,7 @@ class UrlExtraction():
         ind = self.df_urls[self.df_urls['query']!=''].index
         self.to_visit(ind, False)
 
-    def url_iteration(self):
+    def iteration(self):
 
         self.extract_new_url()
         self.raw_cleaning()
