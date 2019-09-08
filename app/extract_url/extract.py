@@ -120,6 +120,10 @@ class UrlExtraction():
         ind = self.df_urls.filter(regex=re.compile('(\/' + '\/|\/'.join(langs) + '\/)'), axis=0).index
         self.to_visit(ind, False)
 
+        # Format selection: keep only .html and .php url 
+        ind = self.df_urls['path'].filter(regex=re.compile('(?!.*(.html|.php))\.[a-z]{2,6}$'), axis=0).index
+        self.to_visit(ind, False)
+
         # Disable fragment
         ind = self.df_urls[self.df_urls['fragment']!=''].index
         self.to_visit(ind, False)
