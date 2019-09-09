@@ -115,12 +115,22 @@ class UrlExtraction():
     def raw_filtering(self, language='fr'):
 
         # Language selection
-        langs = ['fr', 'en', 'es', 'de', 'it', 'us']
+        # Improvement: analyze all languange structure in url and define function instead written rules
+        langs = {
+            'fr':['fr','frfr'],
+            'en':['en','enen'],
+            'es':['es','eses'],
+            'de':['de','dede'],
+            'it':['it','itit'],
+            'us':['us','usus']
+        }
+        langs[language] = []
+        langs = sum(dico_test.values(),[])
         langs.remove(language)
         ind = self.df_urls.filter(regex=re.compile('(\/' + '\/|\/'.join(langs) + '\/)'), axis=0).index
         self.to_visit(ind, False)
 
-        # Format selection: keep only .html and .php url 
+        # Format selection: keep only .html and .php url
         ind = self.df_urls['path'].filter(regex=re.compile('(?!.*(.html|.php))\.[a-z]{2,6}$'), axis=0).index
         self.to_visit(ind, False)
 
