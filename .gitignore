@@ -1,4 +1,4 @@
-data/
+data/url_analysis/*.xlsx
 notebooks/
 __pycache__/
 .DS_store
