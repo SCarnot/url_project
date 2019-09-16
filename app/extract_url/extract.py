@@ -3,58 +3,7 @@ import requests
 import urllib
 import re
 from bs4 import BeautifulSoup
-
-# Define necessary fonctions
-def url_extractor(url):
-
-    # Améliorer le try/except
-    try:
-        response = requests.get(url)
-    except:
-        return []
-
-    soup = BeautifulSoup(response.text, 'html.parser')
-    list_url = list(filter(None,[a['href'] for a in soup.find_all(href=True)]))
-
-    return list(set(list_url))
-
-def url_to_df(url, to_visit=True, visited=False):
-
-    if type(url)==str:
-        url = [url]
-
-    df_url = pd.DataFrame({
-        'to_visit': True,
-        'visited': False,
-        'scheme': [urllib.parse.urlparse(u).scheme for u in url],
-        'netloc': [urllib.parse.urlparse(u).netloc for u in url],
-        'path': [urllib.parse.urlparse(u).path for u in url],
-        'params': [urllib.parse.urlparse(u).params for u in url],
-        'query': [urllib.parse.urlparse(u).query for u in url],
-        'fragment': [urllib.parse.urlparse(u).fragment for u in url]
-    }, index=url
-    )
-
-    return(df_url)
-
-def df_to_url(df):
-
-    url=[]
-    for ind in df.index:
-        url.append(
-            urllib.parse.urlunparse(
-                urllib.parse.ParseResult(
-                    scheme=df.loc[ind,'scheme'],
-                    netloc=df.loc[ind,'netloc'],
-                    path=df.loc[ind,'path'],
-                    params=df.loc[ind,'params'],
-                    query=df.loc[ind,'query'],
-                    fragment=df.loc[ind,'fragment']
-                )
-            )
-        )
-
-    return(url)
+from app.extract_url.utils import url_extractor, url_to_df, df_to_url
 
 class UrlExtraction():
 
@@ -64,7 +13,7 @@ class UrlExtraction():
         self.parsed_main_url = urllib.parse.urlparse(url)
         self.df_urls = url_to_df(url)
         self.urls = list(self.df_urls.index)
-        self.iteration = 0
+        self.nb_iteration = 0
 
     def add_url(self, url):
 
@@ -125,8 +74,8 @@ class UrlExtraction():
             'us':['us','usus']
         }
         langs[language] = []
-        langs = sum(dico_test.values(),[])
-        langs.remove(language)
+        langs = sum(langs.values(),[])
+
         ind = self.df_urls.filter(regex=re.compile('(\/' + '\/|\/'.join(langs) + '\/)'), axis=0).index
         self.to_visit(ind, False)
 
@@ -147,4 +96,4 @@ class UrlExtraction():
         self.extract_new_url()
         self.raw_cleaning()
         self.raw_filtering()
-        self.iteration +=1
+        self.nb_iteration +=1
