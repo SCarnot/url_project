@@ -27,6 +27,7 @@ class UrlExtraction():
 
     def to_visit(self, url, action):
 
+
         self.df_urls.loc[url, 'to_visit'] = action
 
     def visited(self, url, action):
