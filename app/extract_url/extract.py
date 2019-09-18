@@ -3,7 +3,7 @@ import requests
 import urllib
 import re
 from bs4 import BeautifulSoup
-from app.extract_url.utils import url_extractor, url_to_df, df_to_url
+from app.extract_url.utils import url_extractor, url_to_df, df_to_url, make_the_soup
 
 class UrlExtraction():
 
@@ -58,8 +58,9 @@ class UrlExtraction():
 
         for url in visiting_list:
             print('Visiting url', url)
+            new_soup = make_the_soup(url)
             self.visited(url, True)
-            self.add_url(url_extractor(url))
+            self.add_url(url_extractor(new_soup))
 
     def raw_filtering(self, language='fr'):
 
@@ -96,9 +97,9 @@ class UrlExtraction():
         self.extract_new_url()
         self.raw_cleaning()
         self.raw_filtering()
-        self.nb_iteration +=1
+        self.nb_iteration += 1
 
-    def full_iteration(self, n_it=3):
+    def full_iteration(self, n_it=10):
 
         while (self.df_urls[self.df_urls['to_visit']==True].shape[0] > 0) and (self.nb_iteration < n_it):
             print('Iteration:', self.nb_iteration)

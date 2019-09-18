@@ -5,17 +5,19 @@ import re
 from bs4 import BeautifulSoup
 
 # Define necessary fonctions
-def url_extractor(url):
+def make_the_soup(url):
 
-    # Améliorer le try/except
     try:
         response = requests.get(url)
     except:
         return []
 
     soup = BeautifulSoup(response.text, 'html.parser')
-    list_url = list(filter(None,[a['href'] for a in soup.find_all(href=True)]))
+    return soup
 
+def url_extractor(soup):
+
+    list_url = list(filter(None,[a['href'] for a in soup.find_all(href=True)]))
     return list(set(list_url))
 
 def url_to_df(url, to_visit=True, visited=False):
