@@ -97,3 +97,11 @@ class UrlExtraction():
         self.raw_cleaning()
         self.raw_filtering()
         self.nb_iteration +=1
+
+    def full_iteration(self, n_it=3):
+
+        while (self.df_urls[self.df_urls['to_visit']==True].shape[0] > 0) and (self.nb_iteration < n_it):
+            print('Iteration:', self.nb_iteration)
+            self.iteration()
+        if self.nb_iteration == n_it :
+            print('Max. iterations reached')
