@@ -112,3 +112,15 @@ class UrlExtraction():
             self.iteration()
         if self.nb_iteration == n_it :
             print('Max. iterations reached')
+
+if __name__ == '__main__':
+
+    path_urls = '../data/data_extract_url/urls_example.txt'
+    list_url = pd.read_csv(path_urls).iloc[:,0].to_list()
+
+    for main_url in list_url:
+        print('Website visited:', main_url)
+        Url = UrlExtraction(main_url)
+        Url.full_iteration()
+        file_name = Url.df_urls.loc[Url.main_url,'netloc'].replace('.','-')
+        Url.df_features.to_csv('../../data/data_extract_url/'+file_name+'.csv')
