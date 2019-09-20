@@ -57,3 +57,60 @@ def df_to_url(df):
         )
 
     return(url)
+
+def init_features():
+
+    col = ['nb_eur', 'nb_urls', 'bad_word', 'good_word', 'parent', 'nb_slash', 'end_length', 'url_length']
+
+    return pd.DataFrame(columns=col)
+
+def feature_extractor(url, soup):
+
+    #Feature "bad_word" is set to 1 if one of those not interesting words is present in the url.
+    forbidden_words = ['carte', 'mention', 'fondateur', 'register', 'condition', 'cgv', 'livraison', 'politique', 'login'
+     'guide', 'taille', 'contact', 'account', 'marque', 'journal', 'book']
+    bad_word = 0
+    for wrd in forbidden_words:
+        if wrd in urllib.parse.urlparse(url).path:
+            bad_word = 1
+
+    #Feature "good_word" is set to 1 if one of those intersting words is present in the url.
+    interesting_words = ['chaussure', 'mocassin', 'pull', 'shirt', 'pantalon', 'veste', 'chemise', 'blouson', 'sneakers']
+    regex_end_url = '\/(?!((.+)\/))(.+)' #Separate the last part of path's url
+    good_word = 0
+    if re.search(regex_end_url, url):
+        for wrd in interesting_words:
+            if wrd in re.findall(regex_end_url,url)[0][2]:
+                good_word = 1
+
+    #Measure the number of links to other url in the soup
+    nb_urls = len(url_extractor(soup))
+
+    # Url total Length
+    url_length = len(url)
+
+    # Length of the last string in the url
+    end_length = 0
+    if re.search(regex_end_url, url):
+        end_length = len(re.findall(regex_end_url, url)[0][2])
+
+    # Number of '/'
+    nb_slash = len(re.findall('(\/)',url))
+
+    # Number of '€' symbol
+    nb_eur = len(soup.find_all(string=re.compile('€')))
+    parent = 0
+
+    df_feature = pd.DataFrame({
+        'nb_eur':[nb_eur],
+        'nb_urls':[nb_urls],
+        'bad_word':[bad_word],
+        'good_word':[good_word],
+        'parent':[parent],
+        'nb_slash':[nb_slash],
+        'end_length':[end_length],
+        'url_length':[url_length],
+        'url':url
+        }).set_index('url')
+
+    return df_feature
