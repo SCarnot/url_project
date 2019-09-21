@@ -3,3 +3,4 @@ notebooks/
 __pycache__/
 .DS_store
 .ipynb_checkpoints
+data/fashion-dataset
