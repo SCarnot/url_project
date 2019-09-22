@@ -2,6 +2,13 @@ import pandas as pd
 import requests
 import urllib
 import re
+import sys
+import os
+import json
+
+ROOT_DIR = os.path.abspath("")
+sys.path.append(ROOT_DIR)  # To find local version of the library
+
 from bs4 import BeautifulSoup
 from app.extract_url.utils import url_extractor, url_to_df, df_to_url, make_the_soup, init_features, feature_extractor
 
@@ -105,7 +112,7 @@ class UrlExtraction():
         self.raw_filtering()
         self.nb_iteration += 1
 
-    def full_iteration(self, n_it=10):
+    def full_iteration(self, n_it=12):
 
         while (self.df_urls[self.df_urls['to_visit']==True].shape[0] > 0) and (self.nb_iteration < n_it):
             print('Iteration:', self.nb_iteration)
@@ -115,12 +122,19 @@ class UrlExtraction():
 
 if __name__ == '__main__':
 
-    path_urls = '../data/data_extract_url/urls_example.txt'
-    list_url = pd.read_csv(path_urls).iloc[:,0].to_list()
+    path_urls = ROOT_DIR + '/data/ressources/url_examples.json'
 
-    for main_url in list_url:
-        print('Website visited:', main_url)
-        Url = UrlExtraction(main_url)
+    #Create dump file if not created (not tracked by git)
+    if not os.path.exists(ROOT_DIR + '/data/dump/'):
+        os.makedirs(ROOT_DIR + '/data/dump/')
+
+    with open(path_urls) as data_file:
+        urls = json.load(data_file, encoding='utf8')
+
+    for key, value in urls.items():
+
+        print('Website visited:', value)
+        Url = UrlExtraction(value)
         Url.full_iteration()
-        file_name = Url.df_urls.loc[Url.main_url,'netloc'].replace('.','-')
-        Url.df_features.to_csv('../../data/data_extract_url/'+file_name+'.csv')
+        file_name = ROOT_DIR + '/data/dump/' + key + '.csv'
+        Url.df_features.to_csv(file_name)
