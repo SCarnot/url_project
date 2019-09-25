@@ -46,23 +46,6 @@ class UrlExtraction():
 
         self.df_features = self.df_features.append(feat)
 
-    def raw_cleaning(self):
-
-        # Build empty netloc url
-        ind_netloc = self.df_urls[self.df_urls['netloc']==''].index
-        self.df_urls.loc[ind_netloc,'scheme'] = self.parsed_main_url.scheme
-        self.df_urls.loc[ind_netloc,'netloc'] = self.parsed_main_url.netloc
-        self.df_urls = self.df_urls.drop_duplicates(
-            subset=['scheme', 'netloc', 'path', 'params', 'query', 'fragment'])
-        self.df_urls.index = df_to_url(self.df_urls)
-
-        #Drop external netloc
-        self.drop_url(self.df_urls[self.df_urls['netloc']!=self.parsed_main_url.netloc].index)
-        #Drop other scheme
-        self.drop_url(self.df_urls[self.df_urls['scheme']!=self.parsed_main_url.scheme].index)
-        #Drop empty path
-        self.drop_url(self.df_urls[self.df_urls['path']==''].index)
-
     def extract_new_url(self):
 
         visiting_list = list(self.df_urls[self.df_urls['to_visit']==True].index)
@@ -74,6 +57,29 @@ class UrlExtraction():
             self.visited(url, True)
             self.add_url(url_extractor(new_soup))
             self.add_features(feature_extractor(url, new_soup))
+
+    def raw_cleaning(self):
+
+        # Build empty netloc url
+        ind_netloc = self.df_urls[self.df_urls['netloc']==''].index
+        self.df_urls.loc[ind_netloc,'scheme'] = self.parsed_main_url.scheme
+        self.df_urls.loc[ind_netloc,'netloc'] = self.parsed_main_url.netloc
+
+        # Ensure path begins with a '/'
+        if self.df_urls.loc[ind_netloc,'path'][0] != '/':
+            self.df_urls.loc[ind_netloc,'path'] = '/' + self.df_urls.loc[ind_netloc,'path']
+
+        self.df_urls = self.df_urls.drop_duplicates(
+            subset=['scheme', 'netloc', 'path', 'params', 'query', 'fragment'])
+
+        self.df_urls.index = df_to_url(self.df_urls)
+
+        #Drop external netloc
+        self.drop_url(self.df_urls[self.df_urls['netloc']!=self.parsed_main_url.netloc].index)
+        #Drop other scheme
+        self.drop_url(self.df_urls[self.df_urls['scheme']!=self.parsed_main_url.scheme].index)
+        #Drop empty path
+        self.drop_url(self.df_urls[self.df_urls['path']==''].index)
 
     def raw_filtering(self, language='fr'):
 
