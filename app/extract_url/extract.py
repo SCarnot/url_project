@@ -6,6 +6,9 @@ import sys
 import os
 import json
 
+ROOT_DIR = os.path.abspath("")
+sys.path.append(ROOT_DIR)  # To find local version of the library
+
 from bs4 import BeautifulSoup
 from app.extract_url.utils import url_extractor, url_to_df, df_to_url, make_the_soup, init_features, feature_extractor
 
@@ -126,9 +129,6 @@ class UrlExtraction():
 
 if __name__ == '__main__':
 
-    ROOT_DIR = os.path.abspath("")
-    sys.path.append(ROOT_DIR)  # To find local version of the library
-
     path_urls = ROOT_DIR + '/data/ressources/url_examples.json'
 
     #Create dump file if not created (not tracked by git)
@@ -141,7 +141,7 @@ if __name__ == '__main__':
     for key, value in urls.items():
 
         print('Website visited:', value)
-        Url = UrlExtraction(value)
+        Url = UrlExtraction(value, ROOT_DIR)
         Url.full_iteration()
         file_name = ROOT_DIR + '/data/dump/' + key + '.csv'
         Url.df_features.to_csv(file_name)
