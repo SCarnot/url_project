@@ -1,0 +1,17 @@
+{
+  "forbidden_words": [
+    "carte", "mention", "fondateur", "register", "condition", "cgv", "livraison", "politique", "login", "guide",
+    "contact", "account", "compte", "marque", "journal", "lookbook", "retailer", "question", "cadeaux", "atelier", "fabrication", "entretien",
+    "retours", "email", "magasin", "matiere", "carriere", "join", "career", "password", "mot-de-passe", "collection", "atelier"
+  ],
+  "interesting_words": {
+    "haut": ["shirt", "chemise", "pull", "sweat", "polo", "t-shirt", "tee-shirt", "boot", "sandale"],
+    "bas": ["jean", "pantalon", "chinos"],
+    "chaussure": ["basket", "escarpin", "sneaker", "botte", "mocassin", "derbie", "richelieu"],
+    "accessoire": ["ceinture", "cravate", "lunette", "bonnet", "echarpe", "maillot", "sac", "fouta", "casquette", "sacoche", "portefeuille"],
+    "exterieur": ["veste", "blouson", "costume", "manteau", "parka", "trench", "imper", "cardigan", "teddy"],
+    "couleur": ["bleu", "jaune", "rouge", "orange", "rose", "vert", "noir", "gris", "blanc", "black", "taupe", "armagnac", "bordeau", "gold", "pourpre",
+      "cafe", "corail", "marine", "camel", "brun", "or", "chocolat", "creme", "carmin", "ambre", "caramel", "zebre",
+      "cognac", "gris"]
+  }
+}

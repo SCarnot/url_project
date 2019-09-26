@@ -6,15 +6,12 @@ import sys
 import os
 import json
 
-ROOT_DIR = os.path.abspath("")
-sys.path.append(ROOT_DIR)  # To find local version of the library
-
 from bs4 import BeautifulSoup
 from app.extract_url.utils import url_extractor, url_to_df, df_to_url, make_the_soup, init_features, feature_extractor
 
 class UrlExtraction():
 
-    def __init__(self, url):
+    def __init__(self, url, ROOT_DIR):
 
         self.main_url = url
         self.parsed_main_url = urllib.parse.urlparse(url)
@@ -22,6 +19,7 @@ class UrlExtraction():
         self.df_features = init_features()
         self.urls = list(self.df_urls.index)
         self.nb_iteration = 0
+        self.ROOT_DIR = ROOT_DIR
 
     def add_url(self, url):
 
@@ -51,12 +49,13 @@ class UrlExtraction():
         visiting_list = list(self.df_urls[self.df_urls['to_visit']==True].index)
         print('Number of url to visit :', len(visiting_list))
 
+        path_voc = self.ROOT_DIR + "/data/ressources/vocabulary.json"
         for url in visiting_list:
             print('Visiting url', url)
             new_soup = make_the_soup(url)
             self.visited(url, True)
             self.add_url(url_extractor(new_soup))
-            self.add_features(feature_extractor(url, new_soup))
+            self.add_features(feature_extractor(url, new_soup, path_voc))
 
     def raw_cleaning(self):
 
@@ -66,8 +65,7 @@ class UrlExtraction():
         self.df_urls.loc[ind_netloc,'netloc'] = self.parsed_main_url.netloc
 
         # Ensure path begins with a '/'
-        if self.df_urls.loc[ind_netloc,'path'][0] != '/':
-            self.df_urls.loc[ind_netloc,'path'] = '/' + self.df_urls.loc[ind_netloc,'path']
+        self.df_urls.loc[ind_netloc,'path'] = self.df_urls.loc[ind_netloc,'path'].apply(lambda x : ('/' + x).replace('//','/'))
 
         self.df_urls = self.df_urls.drop_duplicates(
             subset=['scheme', 'netloc', 'path', 'params', 'query', 'fragment'])
@@ -127,6 +125,9 @@ class UrlExtraction():
             print('Max. iterations reached')
 
 if __name__ == '__main__':
+
+    ROOT_DIR = os.path.abspath("")
+    sys.path.append(ROOT_DIR)  # To find local version of the library
 
     path_urls = ROOT_DIR + '/data/ressources/url_examples.json'
 

@@ -2,7 +2,13 @@ import pandas as pd
 import requests
 import urllib
 import re
+import os
+import sys
+import json
 from bs4 import BeautifulSoup
+
+ROOT_DIR = os.path.abspath("")
+sys.path.append(ROOT_DIR)  # To find local version of the library
 
 # Define necessary fonctions
 def make_the_soup(url):
@@ -64,24 +70,39 @@ def init_features():
 
     return pd.DataFrame(columns=col)
 
-def feature_extractor(url, soup):
+def feature_extractor(url, soup, path_voc):
+
+    with open(path_voc) as data_file:
+        vocab = json.load(data_file, encoding='utf8')
+
+    # Extract the end of the url for find interesting words and its size.
+    regex_end_url = '\/(?!((.+)\/))(.+)' #Separate the last part of path's url
+    if re.findall(regex_end_url, url):
+        end_url = (re.findall(regex_end_url, url)[0][2])
+    else:
+        end_url = ''
 
     #Feature "bad_word" is set to 1 if one of those not interesting words is present in the url.
-    forbidden_words = ['carte', 'mention', 'fondateur', 'register', 'condition', 'cgv', 'livraison', 'politique', 'login'
-     'guide', 'taille', 'contact', 'account', 'marque', 'journal', 'book']
-    bad_word = 0
-    for wrd in forbidden_words:
-        if wrd in urllib.parse.urlparse(url).path:
-            bad_word = 1
+    forbidden_words = vocab['forbidden_words']
+    regex_forbidden = '(' + forbidden_words[0]
+    for voc in forbidden_words[1:]:
+        regex_forbidden += '|' + voc
+    regex_forbidden += ')s*(-|$|\.)'
+    if re.search(re.compile(regex_forbidden) ,url.strip()):
+        bad_word = 1
+    else:
+        bad_word = 0
 
     #Feature "good_word" is set to 1 if one of those intersting words is present in the url.
-    interesting_words = ['chaussure', 'mocassin', 'pull', 'shirt', 'pantalon', 'veste', 'chemise', 'blouson', 'sneakers']
-    regex_end_url = '\/(?!((.+)\/))(.+)' #Separate the last part of path's url
-    good_word = 0
-    if re.search(regex_end_url, url):
-        for wrd in interesting_words:
-            if wrd in re.findall(regex_end_url,url)[0][2]:
-                good_word = 1
+    interesting_words = sum(vocab['interesting_words'].values(),[])
+    regex_interesting = '(-|^)(' + interesting_words[0]
+    for voc in interesting_words[1:]:
+        regex_interesting += '|' + voc
+    regex_interesting += ')s*(-|$|\.)'
+    if re.search(re.compile(regex_interesting) ,url.strip()):
+        good_word = 1
+    else:
+        good_word=0
 
     #Measure the number of links to other url in the soup
     nb_urls = len(url_extractor(soup))
@@ -90,9 +111,7 @@ def feature_extractor(url, soup):
     url_length = len(url)
 
     # Length of the last string in the url
-    end_length = 0
-    if re.search(regex_end_url, url):
-        end_length = len(re.findall(regex_end_url, url)[0][2])
+    end_length = len(end_url)
 
     # Number of '/'
     nb_slash = len(re.findall('(\/)',url))
