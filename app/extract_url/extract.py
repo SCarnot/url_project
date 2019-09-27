@@ -92,7 +92,10 @@ class UrlExtraction():
             'es':['es','eses'],
             'de':['de','dede'],
             'it':['it','itit'],
-            'us':['us','usus']
+            'us':['us','usus'],
+            'eu':['eu','eueu'],
+            'asia':['asia'],
+            'china':['china']
         }
         langs[language] = []
         langs = sum(langs.values(),[])
