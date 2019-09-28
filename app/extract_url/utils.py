@@ -16,7 +16,8 @@ def make_the_soup(url):
     try:
         response = requests.get(url)
     except:
-        return []
+        # If the url is incorrect, return a simple soup ()'No response!') with no urls.
+        return BeautifulSoup('No response!', 'html.parser')
 
     soup = BeautifulSoup(response.text, 'html.parser')
     return soup
