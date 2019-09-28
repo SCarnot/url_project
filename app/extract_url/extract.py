@@ -81,6 +81,8 @@ class UrlExtraction():
         self.drop_url(self.df_urls[self.df_urls['scheme']!=self.parsed_main_url.scheme].index)
         #Drop empty path
         self.drop_url(self.df_urls[self.df_urls['path']==''].index)
+        #Drop  url with non-ascii characters
+        self.drop_url(self.df_urls[self.df_urls['path'].str.contains('[^\x00-\x7F]+', regex=True)].index)
 
     def raw_filtering(self, language='fr'):
 
